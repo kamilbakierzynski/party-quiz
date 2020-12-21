@@ -1,0 +1,43 @@
+.page_wrapper {
+  width: 100%;
+  height: 100vh;
+  > .content_wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    > .action_section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: 50vw;
+      margin-right: 32px;
+      > .join_input {
+        display: flex;
+        width: min-content;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        margin-top:20px;
+        background-color: white;
+        border-radius: 20px;
+        -webkit-box-shadow: 0px 11px 39px -3px rgba(0, 0, 0, 0.9);
+        box-shadow: 0px 11px 39px -3px rgba(0, 0, 0, 0.9);
+        margin-bottom: 20px;
+        input {
+          margin-right: 64px;
+        }
+      }
+    }
+    > .public_games {
+      height: 100vh;
+      overflow: scroll;
+      padding-top: 64px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
+}

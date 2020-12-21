@@ -1,0 +1,25 @@
+@import "../../styles/global.scss";
+
+.page_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 30px;
+  align-items: center;
+  h1 {
+    font-size: 4em;
+    margin-bottom: 10px;
+  }
+  > .form_wrapper {
+    border: $light_gray_border;
+    border-radius: 20px;
+    padding: 30px;
+    > .username_input {
+      display: flex;
+      height: max-content;
+      input {
+        margin-right: 10px;
+      }
+    }
+  }
+}

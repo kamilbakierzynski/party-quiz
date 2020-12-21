@@ -1,0 +1,105 @@
+@import "../../../styles/global.scss";
+
+.page_wrapper {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+
+  > .main_game_window {
+    height: 100vh;
+    flex-grow: 3;
+    -webkit-box-shadow: inset -12px 1px 25px -5px #000000;
+    box-shadow: inset -12px 0px 35px -10px #000000;
+  }
+  > .game_chat {
+    height: 100vh;
+    width: 350px;
+    padding-top: 20px;
+    padding-left: 8px;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+    > .score_board {
+      height: 20%;
+      width: 100%;
+      background-color: #86a6df;
+      border: $light_gray_border;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+    > .chat_card {
+      width: 100%;
+      height: 80%;
+      border: $light_gray_border;
+      border-radius: 10px 10px 0px 0px;
+      display: flex;
+      flex-direction: column;
+      > .chat_messages {
+        height: 100%;
+        width: 100%;
+        background-color: #f8f8f8;
+        border-radius: 10px 10px 0px 0px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding-left: 20px;
+        padding-right: 20px;
+        overflow-y: auto;
+
+        > .server_message {
+          text-align: center;
+          margin-bottom: 3px;
+          color: #393e46;
+        }
+
+        > .message_section {
+          > .username {
+            font-weight: bold;
+            color: #222831;
+          }
+          > .message {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            > .text {
+              overflow-wrap: anywhere;
+              border: $light_gray_border;
+              padding: 10px;
+              flex-grow: 1;
+              background-color: #efecec;
+              font-size: 1.05em;
+              margin: 2px;
+              margin-bottom: 10px;
+              border-radius: 10px;
+            }
+            > .time {
+              margin-bottom: 10px;
+              margin-left: 10px;
+              color: #d9d9d9;
+            }
+          }
+        }
+      }
+      > .message_sender {
+        padding: 4px;
+        height: 50px;
+        width: 100%;
+        border-top: $light_gray_border;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        div {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+
+  .header {
+    height: 64px;
+    background-color: green;
+  }
+}
