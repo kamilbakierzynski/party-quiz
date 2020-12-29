@@ -13,16 +13,21 @@ export interface CurrentGameStore {
   addMessageToState: Action<CurrentGameStore, Message>;
   sendMessage: Thunk<CurrentGameStore, Message, StoreModel>;
   listenForChatMessages: Thunk<CurrentGameStore, never, StoreModel>;
+  listenForGameState: Thunk<CurrentGameStore, never, StoreModel>;
   stopListeningForChatMessages: Thunk<CurrentGameStore, never, StoreModel>;
+  stopListeningForGameState: Thunk<CurrentGameStore, never, StoreModel>;
   clearStore: Action<CurrentGameStore>;
 }
 
 const currentGame: CurrentGameStore = {
-  mqttReducer: thunk((actions, payload, {getState}) => {
-    const {topic, message} = payload;
+  mqttReducer: thunk((actions, payload, { getState }) => {
+    const { topic, message } = payload;
     const { game } = getState();
     if (topic === `game/chat/${game?.id}`) {
       actions.addMessageToState(JSON.parse(message.toString()));
+    } else if (topic === `game/state/${game?.id}`) {
+      console.log(JSON.parse(message.toString()));
+      // actions.setGame(JSON.parse(message.toString()));
     }
   }),
   game: undefined,
@@ -47,16 +52,31 @@ const currentGame: CurrentGameStore = {
       mqtt.subscribe(chatTopic);
     }
   }),
+  listenForGameState: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      const chatTopic = `game/state/${game.id}`;
+      mqtt.subscribe(chatTopic);
+    }
+  }),
   stopListeningForChatMessages: thunk(
     async (actions, payload, { getState }) => {
       const { game } = getState();
       if (game?.id) {
-        const chatTopic = `game/chat/${game.id}`;
+        const chatTopic = `game/state/${game.id}`;
         mqtt.unsubscribe(chatTopic);
         actions.clearStore();
       }
     }
   ),
+  stopListeningForGameState: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      const chatTopic = `game/state/${game.id}`;
+      mqtt.unsubscribe(chatTopic);
+      actions.clearStore();
+    }
+  }),
   clearStore: action((state, payload) => {
     state.game = undefined;
     state.chatMessages = [];

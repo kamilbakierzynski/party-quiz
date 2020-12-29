@@ -23,6 +23,7 @@ export interface GamesListResponse {
 
 export interface JoinGameResponse {
   response: ResponseStatus;
+  id: string;
 }
 
 export type ResponseStatus = "OK" | "FAIL";

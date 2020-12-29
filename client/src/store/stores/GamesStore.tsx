@@ -13,7 +13,13 @@ export interface GamesStore {
   overwriteGamesArray: Action<GamesStore, Array<Game>>;
   createGame: Thunk<GamesStore, CreateGame, never, never, Promise<string>>;
   getGames: Thunk<GamesStore>;
-  joinGame: Thunk<GamesStore, JoinGame, never, never, Promise<boolean>>;
+  joinGame: Thunk<
+    GamesStore,
+    JoinGame,
+    never,
+    never,
+    Promise<{ status: boolean; id?: string }>
+  >;
 }
 
 const games: GamesStore = {
@@ -46,9 +52,9 @@ const games: GamesStore = {
       })
       .then(({ data }) => {
         if (data.response === "OK") {
-          return true;
+          return { status: true, id: data.id };
         }
-        return false;
+        return { status: false };
       });
   }),
 };

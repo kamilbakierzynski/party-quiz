@@ -26,8 +26,8 @@ const GameListItem = ({
 
   const handleJoinButtonClick = () => {
     joinGame({ params: { id: gameId }, body: user! }).then((response) => {
-      if (response) {
-        history.push(`/game/${gameId}`);
+      if (response.status) {
+        history.push(`/game/${response.id}`);
       } else {
         notification["error"]({
           message: "Unable to join the game",

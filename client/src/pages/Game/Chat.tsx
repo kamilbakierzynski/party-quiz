@@ -8,7 +8,6 @@ import moment from "moment";
 const Chat = () => {
   const chatMessages = useStoreState((state) => state.currentGame.chatMessages);
   const user = useStoreState((state) => state.auth.user);
-  console.log(chatMessages);
   return (
     <div className={styles.chat_card}>
       <div className={styles.chat_messages}>

@@ -88,13 +88,19 @@ router.post("/join-game", async (req, res) => {
       }))
     );
     const game = games.find((game) => game.joinCode === code);
+    if (!game) {
+      return res.send({ response: "FAIL" });
+    }
     const currentPlayers = await client.llen(`players-${game.id}`);
     if (currentPlayers < game.maxNumberOfPlayers) {
       const responsePush = await client.rpush(
         `players-${game.id}`,
         JSON.stringify(body)
       );
-      return res.send({ response: responsePush !== undefined ? "OK" : "FAIL" });
+      return res.send({
+        response: responsePush !== undefined ? "OK" : "FAIL",
+        id: game.id,
+      });
     } else {
       return res.send({ response: "FAIL" });
     }
@@ -107,7 +113,10 @@ router.post("/join-game", async (req, res) => {
         `players-${id}`,
         JSON.stringify(body)
       );
-      return res.send({ response: responsePush !== undefined ? "OK" : "FAIL" });
+      return res.send({
+        response: responsePush !== undefined ? "OK" : "FAIL",
+        id: game.id,
+      });
     } else {
       return res.send({ response: "FAIL" });
     }
