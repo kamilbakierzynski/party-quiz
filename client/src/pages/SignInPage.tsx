@@ -86,6 +86,7 @@ const SignInPage = (): JSX.Element => {
             animated
             disabled={username === undefined}
             onClick={registerUser}
+            style={{ margin: 0 }}
           >
             <Button.Content visible>Play</Button.Content>
             <Button.Content hidden>

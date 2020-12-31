@@ -4,6 +4,7 @@ import { User } from "./AuthStore";
 import { Game } from "./GamesStore";
 import { StoreModel } from "../Store";
 import mqtt from "../../config/mqttClient";
+import { serverAxios } from "../../config/serverAxios";
 
 export interface CurrentGameStore {
   mqttReducer: Thunk<CurrentGameStore, MQTTAction>;
@@ -17,6 +18,16 @@ export interface CurrentGameStore {
   stopListeningForChatMessages: Thunk<CurrentGameStore, never, StoreModel>;
   stopListeningForGameState: Thunk<CurrentGameStore, never, StoreModel>;
   clearStore: Action<CurrentGameStore>;
+  // HTPP Endpoints
+  startGame: Thunk<CurrentGameStore, never, StoreModel>;
+  answerQuestion: Thunk<CurrentGameStore, { key: string }, StoreModel>;
+  betOnAnswer: Thunk<
+    CurrentGameStore,
+    { user: User; key: string; bet: number },
+    StoreModel
+  >;
+  nextQuestion: Thunk<CurrentGameStore, never, StoreModel>;
+  skipQuestion: Thunk<CurrentGameStore, never, StoreModel>;
 }
 
 const currentGame: CurrentGameStore = {
@@ -27,7 +38,7 @@ const currentGame: CurrentGameStore = {
       actions.addMessageToState(JSON.parse(message.toString()));
     } else if (topic === `game/state/${game?.id}`) {
       console.log(JSON.parse(message.toString()));
-      // actions.setGame(JSON.parse(message.toString()));
+      actions.setGame(JSON.parse(message.toString()));
     }
   }),
   game: undefined,
@@ -81,7 +92,68 @@ const currentGame: CurrentGameStore = {
     state.game = undefined;
     state.chatMessages = [];
   }),
+  startGame: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      serverAxios.post(`/current-game/${game.id}/start-game`);
+    }
+  }),
+  answerQuestion: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      serverAxios.post(`/current-game/${game.id}/answer-question`, payload);
+    }
+  }),
+  betOnAnswer: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      serverAxios.post(`/current-game/${game.id}/bet-answer`, payload);
+    }
+  }),
+  nextQuestion: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      serverAxios.post(`/current-game/${game.id}/next-question`, payload);
+    }
+  }),
+  skipQuestion: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      serverAxios.post(`/current-game/${game.id}/skip-question`, payload);
+    }
+  }),
 };
+
+export interface GameState {
+  state?: {
+    question?: Question;
+    scores: Array<Score>;
+    bets?: Array<Bet>;
+  };
+}
+
+export interface Question {
+  text: string;
+  possible_answers: Array<Answer>;
+  user_asked: User;
+  user_answer?: Answer;
+}
+
+export interface Answer {
+  key: string;
+  text: string;
+}
+
+export interface Score {
+  user: User;
+  score: number;
+}
+
+export interface Bet {
+  user: User;
+  answer: Answer;
+  bet: number;
+}
 
 export interface Message {
   sender: User;

@@ -2,6 +2,7 @@ import { Action, action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import { Moment } from "moment";
 import { serverAxios } from "../../config/serverAxios";
 import { User } from "./AuthStore";
+import { GameState } from "./CurrentGameStore";
 import {
   GamesListResponse,
   JoinGameResponse,
@@ -59,7 +60,7 @@ const games: GamesStore = {
   }),
 };
 
-export interface Game {
+export interface Game extends GameState {
   id: string;
   gameTitle: string;
   maxNumberOfPlayers: number;
@@ -68,6 +69,7 @@ export interface Game {
   joinedPlayers: Array<User>;
   joinCode: string;
   public: boolean;
+  started: boolean;
   creatorId: string;
 }
 

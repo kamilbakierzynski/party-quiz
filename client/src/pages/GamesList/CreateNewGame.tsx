@@ -69,7 +69,7 @@ const CreateNewGame = () => {
           <div className={styles.form_item}>
             <h4>Maximum number of players:</h4>
             <Rate
-              defaultValue={playersCount}
+              defaultValue={players[playersCount]}
               count={5}
               character={(value: Record<string, number>) =>
                 players[value.index]

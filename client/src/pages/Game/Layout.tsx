@@ -2,6 +2,7 @@ import React from "react";
 import Chat from "./Chat";
 import MQTTGameConnections from "./Main/MQTTGameConnections";
 import styles from "./scss/Layout.module.scss";
+import "./scss/Layout.scss";
 
 const Layout = () => {
   return (
@@ -10,7 +11,6 @@ const Layout = () => {
         <MQTTGameConnections />
       </div>
       <div className={styles.game_chat}>
-        <div className={styles.score_board}></div>
         <Chat />
       </div>
     </div>

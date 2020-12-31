@@ -36,17 +36,19 @@ const GamesList = () => {
           </h1>
           <div className={styles.join_input}>
             <Input
-              label="GAME ID"
+              // enable when screen size > 900
+              // label="GAME ID"
               placeholder="ex. ABCDE"
               size="huge"
               value={inputCode}
-              onChange={(event) => setInputCode(event.target.value)}
+              onChange={(event) => codeInputHandler(event, setInputCode)}
             />
             <Button
               size="huge"
               icon
               labelPosition="right"
               onClick={handleJoinButtonClick}
+              style={{ margin: 0 }}
             >
               Join
               <Icon name="game" />
@@ -61,5 +63,17 @@ const GamesList = () => {
       </div>
     </div>
   );
+};
+
+const codeInputHandler = (
+  event: React.ChangeEvent<HTMLInputElement>,
+  setInputCode: (value: string) => void
+) => {
+  const { value } = event.target;
+  if (value.match(/^[a-zA-Z]+$/)) {
+    setInputCode(value.toUpperCase());
+  } else if (value === "") {
+    setInputCode(value);
+  }
 };
 export default GamesList;

@@ -16,9 +16,8 @@ const PublicGamesList = () => {
     return () => clearInterval(interval);
   }, []);
 
-  console.log(gamesArray)
   return (
-    <Card.Group>
+    <>
       {gamesArray.map((game) => (
         <GameListItem
           gameId={game.id}
@@ -28,7 +27,7 @@ const PublicGamesList = () => {
           gameTitle={game.gameTitle}
         />
       ))}
-    </Card.Group>
+    </>
   );
 };
 export default PublicGamesList;
