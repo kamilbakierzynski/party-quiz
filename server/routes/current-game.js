@@ -1,31 +1,31 @@
 import redis from "../config/redisClient";
 import mqtt from "../config/mqttClient";
 
+export const sendGameState = async (gameId) => {
+  const response = await redis.get(`game-${gameId}`);
+  const format = await {
+    ...JSON.parse(response),
+    joinedPlayers: await redis.lrange(
+      `players-${gameId}`,
+      0,
+      await redis.llen(`players-${gameId}`)
+    ),
+  };
+  mqtt.publish(
+    `game/state/${gameId}`,
+    JSON.stringify({
+      ...format,
+      joinedPlayers: format.joinedPlayers.map((player) => JSON.parse(player)),
+    })
+  );
+};
+
 mqtt.on(`message`, async (topic, message) => {
   // check user connections
-  if (topic.startsWith("game/state")) {
+  if (topic.startsWith("game/state/")) {
     const gameId = topic.replace("game/state/", "");
-    const { action, payload } = JSON.parse(message.toString());
-    const response = await client.get(`game-${gameId}`);
-    const format = {
-      id: gameId,
-      joinedPlayers: await client.lrange(
-        `players-${gameId}`,
-        0,
-        await client.llen(`players-${gameId}`)
-      ),
-      ...JSON.parse(response),
-    };
-    const mapPlayers = [format].map((game) => ({
-      ...game,
-      joinedPlayers: game.joinedPlayers.map(JSON.parse),
-    }));
-    mqtt.publish(
-      `game/state/${gameId}`,
-      JSON.stringify({
-        mapPlayers,
-      })
-    );
+    console.log("send");
+    sendGameState(gameId);
   }
   if (topic.startsWith("game/user-presence/")) {
     const gameId = topic.replace("game/user-presence/", "");
@@ -50,5 +50,6 @@ mqtt.on(`message`, async (topic, message) => {
         })
       );
     }
+    sendGameState(gameId);
   }
 });

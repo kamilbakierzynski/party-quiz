@@ -23,6 +23,7 @@ router.post("/new-game", async (req, res) => {
       joinCode: nanoid(),
       creationDate: Date.now(),
       id,
+      started: false,
       creatorId: body.user.id,
     })
   );
@@ -49,6 +50,7 @@ router.get("/list", async (req, res) => {
   return res.send({
     games: games
       .filter((game) => game.public)
+      .filter((game) => !game.started)
       .map((game) => ({
         ...game,
         joinedPlayers: game.joinedPlayers.map(JSON.parse),
@@ -88,7 +90,7 @@ router.post("/join-game", async (req, res) => {
       }))
     );
     const game = games.find((game) => game.joinCode === code);
-    if (!game) {
+    if (!game || game.started) {
       return res.send({ response: "FAIL" });
     }
     const currentPlayers = await client.llen(`players-${game.id}`);
@@ -108,7 +110,7 @@ router.post("/join-game", async (req, res) => {
     const currentPlayers = await client.llen(`players-${id}`);
     const gameString = await client.get(`game-${id}`);
     const game = JSON.parse(gameString);
-    if (currentPlayers < game.maxNumberOfPlayers) {
+    if (currentPlayers < game.maxNumberOfPlayers && !game.started) {
       const responsePush = await client.rpush(
         `players-${id}`,
         JSON.stringify(body)
