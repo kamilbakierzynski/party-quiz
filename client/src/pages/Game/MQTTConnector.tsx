@@ -6,11 +6,11 @@ import { useStoreActions, useStoreState } from "../../store/hooks";
 import { serverAxios } from "../../config/serverAxios";
 import { Game } from "../../store/stores/GamesStore";
 
-interface MQTTConnector {
+interface MQTTConnectorProps {
   children: JSX.Element;
 }
 
-const MQTTConnector = ({ children }: MQTTConnector) => {
+const MQTTConnector = ({ children }: MQTTConnectorProps) => {
   const { idGame } = useParams() as Params;
   const user = useStoreState((state) => state.auth.user);
   const [awaitConnection, setAwaitConnection] = useState(true);
@@ -32,6 +32,7 @@ const MQTTConnector = ({ children }: MQTTConnector) => {
       `game/user-presence/${idGame}`,
       JSON.stringify({ action: "JOIN", payload: user })
     );
+    //eslint-disable-next-line
   }, [idGame]);
 
   useEffect(() => {
@@ -42,7 +43,8 @@ const MQTTConnector = ({ children }: MQTTConnector) => {
       );
       stopListening();
     };
-  }, []);
+    //eslint-disable-next-line
+  }, [idGame]);
 
   return awaitConnection ? (
     <div style={{ width: "100%", height: "100vh" }}>

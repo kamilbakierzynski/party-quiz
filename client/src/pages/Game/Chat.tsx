@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
-import { Image, Input } from "semantic-ui-react";
-import { useStoreActions, useStoreState } from "../../store/hooks";
+import React from "react";
+import { Image } from "semantic-ui-react";
+import { useStoreState } from "../../store/hooks";
 import MessageSender from "./MessageSender";
 import styles from "./scss/Layout.module.scss";
 import moment from "moment";

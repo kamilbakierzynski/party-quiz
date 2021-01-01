@@ -4,7 +4,7 @@ import { Typography } from "antd";
 import { Button } from "semantic-ui-react";
 import { useStoreState, useStoreActions } from "../../../store/hooks";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const BettingView = () => {
   const game = useStoreState((state) => state.currentGame.game);

@@ -1,11 +1,11 @@
 import React from "react";
-import { Button, Card, Image, Statistic } from "semantic-ui-react";
+import { Button, Card, Image } from "semantic-ui-react";
 import { Moment } from "moment";
 import { useStoreActions, useStoreState } from "../../store/hooks";
 import { useHistory } from "react-router-dom";
 import { notification } from "antd";
 
-interface GameListItem {
+interface GameListItemProps {
   gameId: string;
   gameTitle: string;
   creationDate: Moment;
@@ -19,7 +19,7 @@ const GameListItem = ({
   creationDate,
   currentPlayers,
   maxPlayers,
-}: GameListItem) => {
+}: GameListItemProps) => {
   const joinGame = useStoreActions((actions) => actions.games.joinGame);
   const user = useStoreState((state) => state.auth.user);
   const history = useHistory();
