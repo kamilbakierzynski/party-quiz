@@ -29,6 +29,7 @@ jobs:
           host: ${{ secrets.HOST }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
+          username: ${{ secrets.USERNAME }} 
           script: |
             cd /root/party-quiz/server
             git pull
