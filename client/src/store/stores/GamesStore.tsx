@@ -71,6 +71,7 @@ export interface Game extends GameState {
   public: boolean;
   started: boolean;
   creatorId: string;
+  questionsLeft?: number;
 }
 
 export interface CreateGame {

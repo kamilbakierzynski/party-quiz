@@ -13,14 +13,14 @@ const Chat = () => {
       <div className={styles.chat_messages}>
         {chatMessages.map((message) => {
           if (message.sender === undefined) {
-            return <div className={styles.server_message}>{message.text}</div>;
+            return <div className={styles.server_message} key={message.creationDate?.toString()}>{message.text}</div>;
           }
           const messageStyle =
             message.sender.id === user!.id
               ? styles.message_section
               : styles.message_section;
           return (
-            <div className={messageStyle}>
+            <div className={messageStyle} key={message.creationDate?.toString()}>
               <div className={styles.username}>{message.sender.username}</div>
               <div className={styles.message}>
                 <Image src={message.sender.avatarUrl} size="mini" circular />

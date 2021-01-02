@@ -24,6 +24,7 @@ const GameLayout = () => {
   const allPlayersBetted =
     (game?.joinedPlayers.length || 0) - 1 === game?.state?.bets?.length;
 
+  console.log(game);
   const wrapper = (child: JSX.Element) => {
     return (
       <div className={styles.main_window}>

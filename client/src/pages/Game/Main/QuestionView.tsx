@@ -23,6 +23,7 @@ const QuestionView = () => {
         {game?.state?.question?.possible_answers.map((answer) => (
           <div
             className={styles.answer}
+            key={answer.key}
             onClick={() => answerQuestion({ key: answer.key })}
           >
             <Title style={{ margin: 0 }}>{answer.text}</Title>

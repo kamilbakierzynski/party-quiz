@@ -10,7 +10,7 @@ const CreateNewGame = () => {
   const user = useStoreState((state) => state.auth.user);
   const [gameName, setGameName] = useState(`${user?.username}'s game`);
   const [publicGame, setPublicGame] = useState(false);
-  const [playersCount, setPlayersCount] = useState(4);
+  const [playersCount, setPlayersCount] = useState(6);
   const [loading, setLoading] = useState(false);
   const createNewGame = useStoreActions((actions) => actions.games.createGame);
   const history = useHistory();
@@ -70,7 +70,7 @@ const CreateNewGame = () => {
             <h4>Maximum number of players:</h4>
             <Rate
               defaultValue={players[playersCount]}
-              count={5}
+              count={7}
               character={(value: Record<string, number>) =>
                 players[value.index]
               }
@@ -96,5 +96,5 @@ const CreateNewGame = () => {
   );
 };
 
-const players = [2, 3, 4, 5, 6];
+const players = [2, 3, 4, 5, 6, 7, 8];
 export default CreateNewGame;

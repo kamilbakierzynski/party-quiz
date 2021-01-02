@@ -4,7 +4,6 @@ import {
   Button,
   Divider,
   Icon,
-  Message,
   Progress,
   Statistic,
 } from "semantic-ui-react";
@@ -40,7 +39,7 @@ const WaitingForPlayers = () => {
                 : "https://thumbs.dreamstime.com/b/default-avatar-photo-placeholder-profile-icon-eps-file-easy-to-edit-default-avatar-photo-placeholder-profile-icon-124557887.jpg";
             const isPlayer = game?.joinedPlayers[index] !== undefined;
             return (
-              <div className={styles.user_wrapper}>
+              <div className={styles.user_wrapper} key={index}>
                 <div className={styles.avatar_wrapper}>
                   <Avatar
                     src={avatar}

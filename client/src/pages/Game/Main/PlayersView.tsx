@@ -27,6 +27,7 @@ const PlayersView = () => {
             }
             offset={[-15, 10]}
             style={{ backgroundColor: "#482ff7" }}
+            key={player.id}
           >
             <div
               className={styles.user_wrapper}
