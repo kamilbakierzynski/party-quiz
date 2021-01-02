@@ -33,6 +33,8 @@ jobs:
            cd client
            npm install
            npm run build
+        env:
+          CI: false
        
       - name: Remove contents from nginx folder
         uses: appleboy/ssh-action@master
