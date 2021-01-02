@@ -37,7 +37,6 @@ const currentGame: CurrentGameStore = {
     if (topic === `game/chat/${game?.id}`) {
       actions.addMessageToState(JSON.parse(message.toString()));
     } else if (topic === `game/state/${game?.id}`) {
-      console.log(JSON.parse(message.toString()));
       actions.setGame(JSON.parse(message.toString()));
     }
   }),
