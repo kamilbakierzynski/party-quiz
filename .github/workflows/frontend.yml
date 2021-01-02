@@ -29,9 +29,21 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: cd client  
-      - run: npm install
-      - run: npm run build
+      - run: |
+           cd client
+           npm install
+           npm run build
+       
+      - name: Remove contents from nginx folder
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /var/www/html
+            rm -rf .
 
       # Runs a set of commands using the runners shell
       - name: Copy folder content recursively to remote
@@ -43,7 +55,7 @@ jobs:
           privateKey: ${{ secrets.KEY }} 
           username: ${{ secrets.USERNAME }}
           
-      - name: executing remote ssh commands using ssh key
+      - name: Restart ngnix
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
