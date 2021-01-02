@@ -43,7 +43,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd /var/www/html
-            rm -rf .
+            rm -rf *
 
       # Runs a set of commands using the runners shell
       - name: Copy folder content recursively to remote
