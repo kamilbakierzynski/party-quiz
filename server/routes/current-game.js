@@ -10,6 +10,7 @@ export const sendGameState = async (gameId) => {
       0,
       await redis.llen(`players-${gameId}`)
     ),
+    questionsLeft: await redis.scard(`questions-${gameId}`)
   };
   mqtt.publish(
     `game/state/${gameId}`,

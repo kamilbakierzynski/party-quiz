@@ -2,7 +2,7 @@ import express from "express";
 import client from "../config/redisClient";
 import { sendGameState } from "./current-game";
 import _ from "lodash";
-import { questions } from "../game/questionsList";
+import { populateSetWithQuestions, questions } from "../game/questionsList";
 
 const router = express.Router({ mergeParams: true });
 
@@ -38,10 +38,11 @@ const saveChanges = async (idGame, game) => {
 
 router.post("/:idGame/start-game", async (req, res) => {
   const game = await readGame(req.params.idGame);
+  const questionToAsk = await client.spop(`questions-${req.params.idGame}`);
   const newGameState = {
     scores: game.joinedPlayers.map((user) => ({ user, score: 10 })),
     question: {
-      ..._.sample(questions),
+      ...JSON.parse(questionToAsk),
       user_asked: game.joinedPlayers[0],
     },
   };
@@ -116,6 +117,10 @@ router.post("/:idGame/bet-answer", async (req, res) => {
 
 router.post("/:idGame/next-question", async (req, res) => {
   const game = await readGame(req.params.idGame);
+  if ((await client.scard(`questions-${req.params.idGame}`)) === 0) {
+    populateSetWithQuestions(req.params.idGame);
+  }
+  const questionToAsk = await client.spop(`questions-${req.params.idGame}`);
   const playerIndex = _.indexOf(
     game.joinedPlayers.map((user) => user.id),
     game.state.question.user_asked.id
@@ -126,7 +131,7 @@ router.post("/:idGame/next-question", async (req, res) => {
   const newQuestionState = {
     ...game.state,
     question: {
-      ..._.sample(questions),
+      ...JSON.parse(questionToAsk),
       user_asked: game.joinedPlayers[nextPlayerIndex],
     },
     bets: undefined,
@@ -137,6 +142,10 @@ router.post("/:idGame/next-question", async (req, res) => {
 
 router.post("/:idGame/skip-question", async (req, res) => {
   const game = await readGame(req.params.idGame);
+  if ((await client.scard(`questions-${req.params.idGame}`)) === 0) {
+    populateSetWithQuestions(req.params.idGame);
+  }
+  const questionToAsk = await client.spop(`questions-${req.params.idGame}`);
   const askedPlayerScore = game.state.scores.find(
     (score) => score.user.id === game.state.question.user_asked.id
   );
@@ -154,8 +163,8 @@ router.post("/:idGame/skip-question", async (req, res) => {
     ],
   };
   const playerIndex = _.indexOf(
-    game.joinedPlayers,
-    game.state.question.user_asked
+    game.joinedPlayers.map((player) => player.id),
+    game.state.question.user_asked.id
   );
   const nextPlayerIndex =
     playerIndex + 1 >= game.joinedPlayers.length ? 0 : playerIndex + 1;
@@ -163,7 +172,7 @@ router.post("/:idGame/skip-question", async (req, res) => {
   const newQuestionState = {
     ...updatedScore,
     question: {
-      ..._.sample(questions),
+      ...JSON.parse(questionToAsk),
       user_asked: game.joinedPlayers[nextPlayerIndex],
     },
   };

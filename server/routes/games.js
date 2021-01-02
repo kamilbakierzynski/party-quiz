@@ -3,6 +3,7 @@ import client from "../config/redisClient";
 import mqttClient from "../config/mqttClient";
 import { v4 as uuidv4 } from "uuid";
 import { customAlphabet } from "nanoid";
+import { populateSetWithQuestions } from "../game/questionsList";
 const nanoid = customAlphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 6);
 
 const router = express.Router({ mergeParams: true });
@@ -28,6 +29,7 @@ router.post("/new-game", async (req, res) => {
     })
   );
   await client.rpush(`players-${id}`, JSON.stringify(body.user));
+  await populateSetWithQuestions(id);
 
   mqttClient.subscribe(`game/user-presence/${id}`);
 
