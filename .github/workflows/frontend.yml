@@ -29,12 +29,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-        env:
-          CI: false
       - run: |
            cd client
            npm install
-           npm run build
+           CI=false npm run build
        
       - name: Remove contents from nginx folder
         uses: appleboy/ssh-action@master
