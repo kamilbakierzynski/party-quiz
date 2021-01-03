@@ -52,47 +52,53 @@ const SignInPage = (): JSX.Element => {
           Such a great username! Registering you in a game!
         </Loader>
       </Dimmer>
-      <Segment circular>
-        <Dimmer active={imageLoading}>
-          <Loader indeterminate>You will look great</Loader>
-        </Dimmer>
-        <Popup
-          trigger={
-            <Image
-              src={avatarUrl}
-              size="small"
-              circular
-              onClick={generateNewAvatar}
-              onLoad={() => setImageLoading(false)}
-            />
-          }
-          content="Click to generate new"
-          position="right center"
-        />
-      </Segment>
-      <h1>Party Game</h1>
-      <h4>Please type your username in order to play</h4>
-      <div className={styles.form_wrapper}>
-        <div className={styles.username_input}>
-          <Input
-            size="huge"
-            placeholder="Username"
-            label={{ icon: "asterisk" }}
-            labelPosition="left corner"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
+      <div className={styles.sign_in_card}>
+        <Segment circular>
+          <Dimmer active={imageLoading}>
+            <Loader indeterminate>You will look great</Loader>
+          </Dimmer>
+          <Popup
+            trigger={
+              <Image
+                src={avatarUrl}
+                style={{ width: 200, height: 200 }}
+                circular
+                onClick={generateNewAvatar}
+                onLoad={() => setImageLoading(false)}
+              />
+            }
+            content="Click to generate new"
+            position="right center"
           />
-          <Button
-            animated
-            disabled={username === undefined}
-            onClick={registerUser}
-            style={{ margin: 0 }}
-          >
-            <Button.Content visible>Play</Button.Content>
-            <Button.Content hidden>
-              <Icon name="play" />
-            </Button.Content>
-          </Button>
+        </Segment>
+        <h4>Please type your username in order to play</h4>
+        <div className={styles.form_wrapper}>
+          <div className={styles.username_input}>
+            <Input
+              size="huge"
+              placeholder="Username"
+              label={{ icon: "asterisk" }}
+              labelPosition="left corner"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              onKeyDown={(event: React.KeyboardEvent) => {
+                if (event.key === "Enter") {
+                  registerUser();
+                }
+              }}
+            />
+            <Button
+              animated
+              disabled={username === undefined}
+              onClick={registerUser}
+              style={{ margin: 0 }}
+            >
+              <Button.Content visible>Play</Button.Content>
+              <Button.Content hidden>
+                <Icon name="play" />
+              </Button.Content>
+            </Button>
+          </div>
         </div>
       </div>
     </div>

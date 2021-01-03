@@ -1,12 +1,6 @@
 import React from "react";
 import { Avatar, Typography } from "antd";
-import {
-  Button,
-  Divider,
-  Icon,
-  Progress,
-  Statistic,
-} from "semantic-ui-react";
+import { Button, Divider, Icon, Progress, Statistic } from "semantic-ui-react";
 import { useStoreActions, useStoreState } from "../../../store/hooks";
 import styles from "./WaitingForPlayers.module.scss";
 import { CrownTwoTone } from "@ant-design/icons";
@@ -91,6 +85,7 @@ const WaitingForPlayers = () => {
             labelPosition="left"
             disabled
             color="violet"
+            style={{ marginLeft: 10, marginRight: 10 }}
           >
             <Icon name="circle notched" loading />
             Wait for host to start the game

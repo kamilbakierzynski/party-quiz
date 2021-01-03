@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { Card } from "semantic-ui-react";
-import GameListItem from "../../components/ui/GameListItem";
+import GameListItem from "./GameListItem";
 import moment from "moment";
 import { useStoreActions, useStoreState } from "../../store/hooks";
 
@@ -14,6 +13,7 @@ const PublicGamesList = () => {
       getGames();
     }, 5000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line
   }, []);
 
   return (

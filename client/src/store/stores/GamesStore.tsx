@@ -1,4 +1,4 @@
-import { Action, action, computed, Computed, thunk, Thunk } from "easy-peasy";
+import { Action, action, thunk, Thunk } from "easy-peasy";
 import { Moment } from "moment";
 import { serverAxios } from "../../config/serverAxios";
 import { User } from "./AuthStore";

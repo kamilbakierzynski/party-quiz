@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./scss/GameLayout.module.scss";
-import { Typography } from "antd";
+import { Space, Typography } from "antd";
 import { Button } from "semantic-ui-react";
 import { useStoreActions, useStoreState } from "../../../store/hooks";
 import Avatar from "antd/lib/avatar/avatar";
@@ -31,9 +31,10 @@ const ScoreView = () => {
   return (
     <div className={styles.question_wrapper}>
       <div className={styles.question}>
-        <Title
-          style={{ margin: 0 }}
-        >{`Question for ${game?.state?.question?.user_asked.username} was: ${game?.state?.question?.text}`}</Title>
+        <Space direction="vertical">
+          <Text type="secondary">{`Question for ${game?.state?.question?.user_asked.username} was:`}</Text>
+          <Title style={{ margin: 0 }}>{game?.state?.question?.text}</Title>
+        </Space>
       </div>
       <div className={styles.answers_list}>
         {game?.state?.question?.possible_answers.map((answer) => {

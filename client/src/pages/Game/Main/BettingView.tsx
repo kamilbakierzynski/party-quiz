@@ -1,10 +1,10 @@
 import React from "react";
 import styles from "./scss/GameLayout.module.scss";
-import { Typography } from "antd";
+import { Space, Typography } from "antd";
 import { Button } from "semantic-ui-react";
 import { useStoreState, useStoreActions } from "../../../store/hooks";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const BettingView = () => {
   const game = useStoreState((state) => state.currentGame.game);
@@ -15,13 +15,14 @@ const BettingView = () => {
   return (
     <div className={styles.question_wrapper}>
       <div className={styles.question}>
-        <Title
-          style={{ margin: 0 }}
-        >{`Question for ${game?.state?.question?.user_asked.username} was: ${game?.state?.question?.text}`}</Title>
+        <Space direction="vertical">
+          <Text type="secondary">{`Question for ${game?.state?.question?.user_asked.username} was:`}</Text>
+          <Title style={{ margin: 0 }}>{game?.state?.question?.text}</Title>
+        </Space>
       </div>
       <div className={styles.answers_list}>
         {game?.state?.question?.possible_answers.map((answer) => (
-          <div className={styles.answer}>
+          <div className={styles.answer} key={answer.key}>
             <Title>{answer.text}</Title>
             <div className={styles.bet_actions}>
               <Button.Group size="large">

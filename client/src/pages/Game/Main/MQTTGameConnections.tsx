@@ -19,7 +19,6 @@ const MQTTGameConnections = () => {
     return () => stopListening();
     // eslint-disable-next-line
   }, []);
-
   return hasGameStarted ? <GameLayout /> : <WaitingForPlayers />;
 };
 export default MQTTGameConnections;
