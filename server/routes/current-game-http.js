@@ -2,21 +2,23 @@ import express from "express";
 import client from "../config/redisClient";
 import { sendGameState } from "./current-game";
 import _ from "lodash";
-import { populateSetWithQuestions, questions } from "../game/questionsList";
+import { populateSetWithQuestions } from "../game/questionsList";
+import playersKeyFormatter from "../helpers/keyFormatters/players";
+import gameKeyFormatter from "../helpers/keyFormatters/games";
+import questionsKeyFormatter from "../helpers/keyFormatters/questions";
+import { INITIAL_PLAYER_SCORE, KEY_EXPIRATION, SKIP_QUESTION_PENALTY } from "../config/gameConfig";
 
 const router = express.Router({ mergeParams: true });
 
-const KEY_EXPIRATION = 3600; //in seconds
-
 const readGame = async (idGame) => {
-  const gameKey = `game-${idGame}`;
+  const gameKey = gameKeyFormatter(idGame);
   const response = await client.get(gameKey);
   const format = await {
     ...JSON.parse(response),
     joinedPlayers: await client.lrange(
-      `players-${idGame}`,
+      playersKeyFormatter(idGame),
       0,
-      await client.llen(`players-${idGame}`)
+      await client.llen(playersKeyFormatter(idGame))
     ),
   };
   return {
@@ -26,8 +28,8 @@ const readGame = async (idGame) => {
 };
 
 const saveChanges = async (idGame, game) => {
-  const gameKey = `game-${idGame}`;
-  const response = await client.setex(
+  const gameKey = gameKeyFormatter(idGame);
+  await client.setex(
     gameKey,
     KEY_EXPIRATION,
     JSON.stringify(game)
@@ -37,23 +39,25 @@ const saveChanges = async (idGame, game) => {
 };
 
 router.post("/:idGame/start-game", async (req, res) => {
-  const game = await readGame(req.params.idGame);
-  const questionToAsk = await client.spop(`questions-${req.params.idGame}`);
+  const { idGame } = req.params;
+  const game = await readGame(idGame);
+  const questionToAsk = await client.spop(questionsKeyFormatter(idGame));
   const newGameState = {
-    scores: game.joinedPlayers.map((user) => ({ user, score: 10 })),
+    scores: game.joinedPlayers.map((user) => ({ user, score: INITIAL_PLAYER_SCORE })),
     question: {
       ...JSON.parse(questionToAsk),
       user_asked: game.joinedPlayers[0],
     },
   };
   const startedGame = { ...game, started: true, state: newGameState };
-  await saveChanges(req.params.idGame, startedGame);
+  await saveChanges(idGame, startedGame);
   return res.send({});
 });
 
 router.post("/:idGame/answer-question", async (req, res) => {
-  const key = req.body.key;
-  const game = await readGame(req.params.idGame);
+  const { key } = req.body;
+  const { idGame } = req.params;
+  const game = await readGame(idGame);
   const updatedGameState = {
     ...game.state,
     question: {
@@ -63,13 +67,14 @@ router.post("/:idGame/answer-question", async (req, res) => {
       ),
     },
   };
-  await saveChanges(req.params.idGame, { ...game, state: updatedGameState });
+  await saveChanges(idGame, { ...game, state: updatedGameState });
   return res.send({});
 });
 
 router.post("/:idGame/bet-answer", async (req, res) => {
   const { key, bet, user } = req.body;
-  const game = await readGame(req.params.idGame);
+  const { idGame } = req.params;
+  const game = await readGame(idGame);
   const newBet = {
     user,
     answer: game.state.question.possible_answers.find(
@@ -108,19 +113,20 @@ router.post("/:idGame/bet-answer", async (req, res) => {
       ...updatedGameState,
       scores: [...newScores, updatedAskedPlayerScore],
     };
-    await saveChanges(req.params.idGame, { ...game, state: updatedScore });
+    await saveChanges(idGame, { ...game, state: updatedScore });
     return res.send({});
   }
-  await saveChanges(req.params.idGame, { ...game, state: updatedGameState });
+  await saveChanges(idGame, { ...game, state: updatedGameState });
   return res.send({});
 });
 
 router.post("/:idGame/next-question", async (req, res) => {
-  const game = await readGame(req.params.idGame);
-  if ((await client.scard(`questions-${req.params.idGame}`)) === 0) {
-    populateSetWithQuestions(req.params.idGame);
+  const { idGame } = req.params;
+  const game = await readGame(idGame);
+  if ((await client.scard(questionsKeyFormatter(idGame))) === 0) {
+    populateSetWithQuestions(idGame);
   }
-  const questionToAsk = await client.spop(`questions-${req.params.idGame}`);
+  const questionToAsk = await client.spop(questionsKeyFormatter(idGame));
   const playerIndex = _.indexOf(
     game.joinedPlayers.map((user) => user.id),
     game.state.question.user_asked.id
@@ -136,22 +142,23 @@ router.post("/:idGame/next-question", async (req, res) => {
     },
     bets: undefined,
   };
-  await saveChanges(req.params.idGame, { ...game, state: newQuestionState });
+  await saveChanges(idGame, { ...game, state: newQuestionState });
   return res.send({});
 });
 
 router.post("/:idGame/skip-question", async (req, res) => {
-  const game = await readGame(req.params.idGame);
-  if ((await client.scard(`questions-${req.params.idGame}`)) === 0) {
-    populateSetWithQuestions(req.params.idGame);
+  const { idGame } = req.params;
+  const game = await readGame(idGame);
+  if ((await client.scard(questionsKeyFormatter(idGame))) === 0) {
+    populateSetWithQuestions(idGame);
   }
-  const questionToAsk = await client.spop(`questions-${req.params.idGame}`);
+  const questionToAsk = await client.spop(questionsKeyFormatter(idGame));
   const askedPlayerScore = game.state.scores.find(
     (score) => score.user.id === game.state.question.user_asked.id
   );
   const updatedAskedPlayerScore = {
     ...askedPlayerScore,
-    score: askedPlayerScore.score - 2,
+    score: askedPlayerScore.score - SKIP_QUESTION_PENALTY,
   };
   const updatedScore = {
     ...game.state,

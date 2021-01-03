@@ -1,4 +1,5 @@
-import client from "../config/redisClient";
+import redis from "../config/redisClient";
+import keyFormatter from "../helpers/keyFormatters/questions";
 
 const questionsList = [
   [
@@ -156,21 +157,21 @@ const questionsList = [
   ["Dostajesz cztery interesujące propozycje. Możesz wybrać tylko jedną z nich.", "5 000 000 zł w gotówce", "Przeżycie w zdrowiu do 100 lat", "Zlikwidowanie głodu na całej Ziemi na 10 lat", "Posada prezydenta kraju"],
 ];
 
-const questionFactory = ([text, answer1, answer2, answer3, answer4]) => {
+const questionFactory = ([text, ...answers]) => {
   return {
     text,
     possible_answers: [
-      { key: "0", text: answer1 },
-      { key: "1", text: answer2 },
-      { key: "2", text: answer3 },
-      { key: "3", text: answer4 },
+      ...answers.map((answer, index) =>
+        ({ key: index.toString(), text: answer })
+      )
     ],
   };
 };
 
 export const populateSetWithQuestions = async (gameId) => {
-  await client.sadd(`questions-${gameId}`, ...questions.map(JSON.stringify));
-  await client.expire(`questions-${gameId}`, 3600)
+  const KEY_EXPIRATION = +process.env.KEY_EXPIRATION;
+  await redis.sadd(keyFormatter(gameId), ...questions.map(JSON.stringify));
+  await redis.expire(keyFormatter(gameId), KEY_EXPIRATION)
 }
 
 export const questions = questionsList.map(questionFactory);

@@ -1,19 +1,24 @@
 import redis from "../config/redisClient";
 import mqtt from "../config/mqttClient";
+import Responses from "../helpers/responses/responses";
+import playersKeyFormatter from "../helpers/keyFormatters/players";
+import gameKeyFormatter from "../helpers/keyFormatters/games";
+import questionsKeyFormatter from "../helpers/keyFormatters/questions";
+import MQTTTopics from "../helpers/keyFormatters/mqtt";
 
 export const sendGameState = async (gameId) => {
-  const response = await redis.get(`game-${gameId}`);
+  const response = await redis.get(gameKeyFormatter(gameId));
   const format = await {
     ...JSON.parse(response),
     joinedPlayers: await redis.lrange(
-      `players-${gameId}`,
+      playersKeyFormatter(gameId),
       0,
-      await redis.llen(`players-${gameId}`)
+      await redis.llen(playersKeyFormatter(gameId))
     ),
-    questionsLeft: await redis.scard(`questions-${gameId}`)
+    questionsLeft: await redis.scard(questionsKeyFormatter(gameId))
   };
   mqtt.publish(
-    `game/state/${gameId}`,
+    MQTTTopics.StateFormatter(gameId),
     JSON.stringify({
       ...format,
       joinedPlayers: format.joinedPlayers.map((player) => JSON.parse(player)),
@@ -23,34 +28,38 @@ export const sendGameState = async (gameId) => {
 
 mqtt.on(`message`, async (topic, message) => {
   // check user connections
-  if (topic.startsWith("game/state/")) {
-    const gameId = topic.replace("game/state/", "");
-    console.log("send");
+  if (topic.startsWith(MQTTTopics.State)) {
+    const gameId = MQTTTopics.gameIdFromStateTopic(topic);
     sendGameState(gameId);
   }
-  if (topic.startsWith("game/user-presence/")) {
-    const gameId = topic.replace("game/user-presence/", "");
+  if (topic.startsWith(MQTTTopics.UserPresence)) {
+    const gameId = MQTTTopics.gameIdFromUserPresenceTopic(topic);
     const { action, payload } = JSON.parse(message.toString());
-    if (action === "LEAVE") {
-      const operationStatus = await redis.lrem(
-        `players-${gameId}`,
+    if (action === UserPresenceActions.LEAVE) {
+      await redis.lrem(
+        playersKeyFormatter(gameId),
         0,
         JSON.stringify(payload)
       );
       mqtt.publish(
-        `game/chat/${gameId}`,
+        MQTTTopics.ChatFormatter(gameId),
         JSON.stringify({
-          text: `${payload.username} left the game`,
+          text: Responses.leftGame(payload.username),
         })
       );
     } else {
       mqtt.publish(
-        `game/chat/${gameId}`,
+        MQTTTopics.ChatFormatter(gameId),
         JSON.stringify({
-          text: `${payload.username} joined the game`,
+          text: Responses.joinedGame(payload.username),
         })
       );
     }
     sendGameState(gameId);
   }
 });
+
+const UserPresenceActions = {
+  LEAVE: "LEAVE",
+  JOIN: "JOIN"
+}

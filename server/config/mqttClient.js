@@ -1,5 +1,5 @@
 import mqtt from "mqtt";
-const mqttClient = mqtt.connect("mqtt://localhost:1883");
+const mqttClient = mqtt.connect(process.env.MQTT_BROKER);
 
 mqttClient.on("connect", () => {
   console.log("MQTT connected");
