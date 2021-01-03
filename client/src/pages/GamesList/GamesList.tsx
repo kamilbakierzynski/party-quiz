@@ -6,6 +6,7 @@ import { useStoreActions, useStoreState } from "../../store/hooks";
 import CreateNewGame from "./CreateNewGame";
 import PublicGamesList from "./PublicGamesList";
 import styles from "./scss/GamesList.module.scss";
+import useWindowDimensions from "../../customHooks/useWindowDimensions";
 
 const GamesList = () => {
   const [inputCode, setInputCode] = useState("");
@@ -13,6 +14,7 @@ const GamesList = () => {
   const joinGame = useStoreActions((actions) => actions.games.joinGame);
   const user = useStoreState((state) => state.auth.user);
   const history = useHistory();
+  const { width } = useWindowDimensions();
 
   const handleJoinButtonClick = () => {
     joinGame({ params: { code: inputCode }, body: user! }).then((response) => {
@@ -36,12 +38,16 @@ const GamesList = () => {
           </h1>
           <div className={styles.join_input}>
             <Input
-              // enable when screen size > 900
-              // label="GAME ID"
+              label={width > 900 ? "GAME ID" : undefined}
               placeholder="ex. ABCDE"
               size="huge"
               value={inputCode}
               onChange={(event) => codeInputHandler(event, setInputCode)}
+              onKeyDown={(event: React.KeyboardEvent) => {
+                if (event.key === "Enter") {
+                  handleJoinButtonClick();
+                }
+              }}
             />
             <Button
               size="huge"

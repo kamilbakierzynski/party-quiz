@@ -8,7 +8,7 @@ import Avatar from "antd/lib/avatar/avatar";
 const { Title, Text } = Typography;
 
 const ScoreView = () => {
-  const [time, setTime] = useState(15);
+  const [time, setTime] = useState(30);
   const game = useStoreState((state) => state.currentGame.game);
   const user = useStoreState((state) => state.auth.user);
   const nextQuestion = useStoreActions(

@@ -1,4 +1,4 @@
-import { notification, Rate } from "antd";
+import { notification, Rate, Slider } from "antd";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Button, Checkbox, Input, Modal } from "semantic-ui-react";
@@ -11,6 +11,7 @@ const CreateNewGame = () => {
   const [gameName, setGameName] = useState(`${user?.username}'s game`);
   const [publicGame, setPublicGame] = useState(false);
   const [playersCount, setPlayersCount] = useState(6);
+  const [pointsToWin, setPointsToWin] = useState(40);
   const [loading, setLoading] = useState(false);
   const createNewGame = useStoreActions((actions) => actions.games.createGame);
   const history = useHistory();
@@ -22,6 +23,7 @@ const CreateNewGame = () => {
       gameTitle: gameName,
       public: publicGame,
       maxNumberOfPlayers: players[playersCount],
+      pointsToWin,
       user: user!,
     }).then((response) => {
       setLoading(false);
@@ -75,6 +77,15 @@ const CreateNewGame = () => {
                 players[value.index]
               }
               onChange={(value) => setPlayersCount(value - 1)}
+            />
+          </div>
+          <div className={styles.form_item}>
+            <h4>{`Win when player has ${pointsToWin} points:`}</h4>
+            <Slider
+              min={20}
+              max={100}
+              defaultValue={pointsToWin}
+              onChange={(value: number) => setPointsToWin(value)}
             />
           </div>
         </div>

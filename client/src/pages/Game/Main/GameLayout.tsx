@@ -7,6 +7,7 @@ import styles from "./scss/GameLayout.module.scss";
 import { LoadingOutlined } from "@ant-design/icons";
 import BettingView from "./BettingView";
 import ScoreView from "./ScoreView";
+import GameOver from "./GameOver";
 
 const { Title } = Typography;
 
@@ -23,6 +24,9 @@ const GameLayout = () => {
   );
   const allPlayersBetted =
     (game?.joinedPlayers.length || 0) - 1 === game?.state?.bets?.length;
+  const isGameOver =
+    (game?.state?.scores.filter((score) => score.score >= game.pointsToWin)
+      ?.length || 0) > 0 && game?.state?.question?.user_answer === undefined;
 
   const wrapper = (child: JSX.Element) => {
     return (
@@ -34,6 +38,10 @@ const GameLayout = () => {
       </div>
     );
   };
+
+  if (isGameOver) {
+    return <GameOver />;
+  }
 
   if (allPlayersBetted) {
     return wrapper(

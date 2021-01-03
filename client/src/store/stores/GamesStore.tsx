@@ -1,5 +1,6 @@
 import { Action, action, thunk, Thunk } from "easy-peasy";
 import { Moment } from "moment";
+import { NumberLiteralType } from "typescript";
 import { serverAxios } from "../../config/serverAxios";
 import { User } from "./AuthStore";
 import { GameState } from "./CurrentGameStore";
@@ -64,6 +65,7 @@ export interface Game extends GameState {
   id: string;
   gameTitle: string;
   maxNumberOfPlayers: number;
+  pointsToWin: number;
   currentPlayers: number;
   creationDate: Moment;
   joinedPlayers: Array<User>;
@@ -78,6 +80,7 @@ export interface CreateGame {
   gameTitle: string;
   public: boolean;
   maxNumberOfPlayers: number;
+  pointsToWin: number;
   user: User;
 }
 
