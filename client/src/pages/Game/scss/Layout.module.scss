@@ -12,11 +12,8 @@
 
   > .main_game_window {
     height: 100vh;
+    overflow: auto;
     flex-grow: 3;
-    @media screen and (min-width: 900px) {
-      -webkit-box-shadow: inset -12px 1px 25px -5px #000000;
-      box-shadow: inset -12px 0px 35px -10px #000000;
-    }
   }
   @media screen and (max-width: 1200px) {
     > .game_chat {

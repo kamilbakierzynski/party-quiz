@@ -28,6 +28,9 @@ export interface CurrentGameStore {
   >;
   nextQuestion: Thunk<CurrentGameStore, never, StoreModel>;
   skipQuestion: Thunk<CurrentGameStore, never, StoreModel>;
+  askToChange: Thunk<CurrentGameStore, never, StoreModel>;
+  cancelVote: Thunk<CurrentGameStore, never, StoreModel>;
+  vote: Thunk<CurrentGameStore, { vote: boolean; user: User }, StoreModel>;
 }
 
 const currentGame: CurrentGameStore = {
@@ -121,6 +124,24 @@ const currentGame: CurrentGameStore = {
       serverAxios.post(`/current-game/${game.id}/skip-question`, payload);
     }
   }),
+  askToChange: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      serverAxios.post(`/current-game/${game.id}/ask-to-change`, payload);
+    }
+  }),
+  cancelVote: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      serverAxios.post(`/current-game/${game.id}/cancel-vote`, payload);
+    }
+  }),
+  vote: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      serverAxios.post(`/current-game/${game.id}/vote`, payload);
+    }
+  }),
 };
 
 export interface GameState {
@@ -128,7 +149,19 @@ export interface GameState {
     question?: Question;
     scores: Array<Score>;
     bets?: Array<Bet>;
+    vote?: VoteState;
   };
+}
+
+export interface VoteState {
+  question: string;
+  askingPlayer: User;
+  votes: Array<Vote>;
+}
+
+export interface Vote {
+  user: User;
+  vote: boolean;
 }
 
 export interface Question {

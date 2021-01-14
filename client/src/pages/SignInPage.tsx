@@ -35,7 +35,7 @@ const SignInPage = (): JSX.Element => {
     setRegisterLoading(true);
     const response = await registerNewUser({ username: username!, avatarUrl });
     if (response) {
-      history.push("/games");
+      history.replace("/games");
     } else {
       setRegisterLoading(false);
       notification["error"]({

@@ -188,4 +188,78 @@ router.post("/:idGame/skip-question", async (req, res) => {
   return res.send({});
 });
 
+router.post("/:idGame/ask-to-change", async (req, res) => {
+  const { idGame } = req.params;
+  const game = await readGame(idGame);
+  const askedPlayer = game.state.question.user_asked;
+  const prepareVote = {
+    question: game.state.question.text,
+    askingPlayer: askedPlayer,
+    votes: []
+  };
+  const newState = {
+    ...game.state,
+    vote: prepareVote,
+  };
+  await saveChanges(req.params.idGame, { ...game, state: newState });
+  return res.send({});
+});
+
+router.post("/:idGame/cancel-vote", async (req, res) => {
+  const { idGame } = req.params;
+  const game = await readGame(idGame);
+  const newState = {
+    ...game.state,
+    vote: undefined,
+  };
+  await saveChanges(req.params.idGame, { ...game, state: newState });
+  return res.send({});
+})
+
+router.post("/:idGame/vote", async (req, res) => {
+  const { vote, user } = req.body;
+  const { idGame } = req.params;
+  const game = await readGame(idGame);
+  const newVote = {
+    user,
+    vote
+  };
+  const votesAfterAdd = [...game.state.vote.votes, newVote];
+  const newState = {
+    ...game.state,
+    vote: {
+      ...game.state.vote,
+      votes: votesAfterAdd
+    }
+  }
+  await saveChanges(req.params.idGame, { ...game, state: newState });
+  setTimeout(async () => {
+    if (game.joinedPlayers.length - 1 === votesAfterAdd.length) {
+      if (votesAfterAdd.every((vote) => vote.vote === true)) {
+        if ((await client.scard(questionsKeyFormatter(idGame))) === 0) {
+          populateSetWithQuestions(idGame);
+        }
+        const questionToAsk = await client.spop(questionsKeyFormatter(idGame));
+        const newQuestionState = {
+          ...game.state,
+          question: {
+            ...game.state.question,
+            ...JSON.parse(questionToAsk),
+          },
+          vote: undefined
+        };
+
+        await saveChanges(req.params.idGame, { ...game, state: newQuestionState });
+      } else {
+        const newState = {
+          ...game.state,
+          vote: undefined,
+        };
+        await saveChanges(req.params.idGame, { ...game, state: newState });
+      }
+    }
+    return res.send({});
+  }, 3000);
+});
+
 export default router;

@@ -7,6 +7,7 @@ import CreateNewGame from "./CreateNewGame";
 import PublicGamesList from "./PublicGamesList";
 import styles from "./scss/GamesList.module.scss";
 import useWindowDimensions from "../../customHooks/useWindowDimensions";
+import Menu from "../../components/ui/Menu";
 
 const GamesList = () => {
   const [inputCode, setInputCode] = useState("");
@@ -31,6 +32,7 @@ const GamesList = () => {
 
   return (
     <div className={styles.page_wrapper}>
+      <Menu />
       <div className={styles.content_wrapper}>
         <div className={styles.action_section}>
           <h1>

@@ -115,7 +115,7 @@ const questionsList = [
     "Nikt z nas",
   ],
   [
-    "Czy twój rząd wystarczająco wspier najbiedniejszych?",
+    "Czy twój rząd wystarczająco wspiera najbiedniejszych?",
     "Bardziej niż to potrzebne",
     "Wystarczająco",
     "W sam raz",

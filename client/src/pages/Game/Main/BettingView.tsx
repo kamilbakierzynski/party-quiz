@@ -22,7 +22,7 @@ const BettingView = () => {
       </div>
       <div className={styles.answers_list}>
         {game?.state?.question?.possible_answers.map((answer) => (
-          <div className={styles.answer} key={answer.key}>
+          <div className={styles.answer__bet} key={answer.key}>
             <Title>{answer.text}</Title>
             <div className={styles.bet_actions}>
               <Button.Group size="large">

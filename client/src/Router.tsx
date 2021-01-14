@@ -7,6 +7,7 @@ import GamesList from "./pages/GamesList/GamesList";
 import SignInPage from "./pages/SignInPage";
 import { useStoreActions, useStoreState } from "./store/hooks";
 import mqtt from "./config/mqttClient";
+import Messages from "./pages/Messages/Messages";
 
 const Router = (): JSX.Element => {
   const signedIn = useStoreState((state) => state.auth.signedIn);
@@ -39,6 +40,9 @@ const Router = (): JSX.Element => {
       </Route>
       <RestrictedPath path="/games">
         <GamesList />
+      </RestrictedPath>
+      <RestrictedPath path="/messages">
+        <Messages />
       </RestrictedPath>
       <RestrictedPath path="/game/:idGame">
         <MQTTConnector>

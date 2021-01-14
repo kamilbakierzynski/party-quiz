@@ -8,6 +8,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import BettingView from "./BettingView";
 import ScoreView from "./ScoreView";
 import GameOver from "./GameOver";
+import WaitToAnswer from "./WaitToAnswer";
 
 const { Title } = Typography;
 
@@ -96,12 +97,7 @@ const GameLayout = () => {
       );
     }
   } else {
-    return wrapper(
-      <div className={styles.info_box}>
-        <Title>Wait for {answeringUser?.username} to answer question.</Title>
-        <LoadingOutlined style={{ fontSize: 50 }} />
-      </div>
-    );
+    return wrapper(<WaitToAnswer answeringUser={answeringUser} />);
   }
 };
 export default GameLayout;

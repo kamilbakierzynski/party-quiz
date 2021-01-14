@@ -4,6 +4,7 @@ import { Space, Typography } from "antd";
 import { Button } from "semantic-ui-react";
 import { useStoreActions, useStoreState } from "../../../store/hooks";
 import Avatar from "antd/lib/avatar/avatar";
+import { DollarTwoTone } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -19,13 +20,15 @@ const ScoreView = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (time < 1) {
-        isAskedUser && nextQuestion();
-        clearInterval(interval);
-      }
       setTime((oldTime) => oldTime - 1);
     }, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (time < 1) {
+      isAskedUser && nextQuestion();
+    }
   }, [time]);
 
   return (
@@ -42,7 +45,7 @@ const ScoreView = () => {
             game.state?.question?.user_answer?.key === answer.key;
           return (
             <div
-              className={`${styles.answer} ${
+              className={`${styles.answer__score} ${
                 correctAnswer ? styles.correct_answer : undefined
               }`}
             >
@@ -56,11 +59,18 @@ const ScoreView = () => {
                       <div className={styles.user_wrapper}>
                         <Avatar
                           src={bet.user.avatarUrl}
-                          size={70}
+                          size={40}
                           style={{ marginLeft: 10, marginRight: 10 }}
                         />
                         <Title level={5}>{bet.user.username}</Title>
-                        <div className={styles.bet}>{bet.bet}</div>
+                        <div className={styles.overlay_icon}>
+                          {bet.bet === 2 && (
+                            <DollarTwoTone
+                              twoToneColor="#ffcc00"
+                              style={{ fontSize: 25 }}
+                            />
+                          )}
+                        </div>
                       </div>
                     ))}
                 </div>
