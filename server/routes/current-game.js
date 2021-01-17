@@ -5,6 +5,7 @@ import playersKeyFormatter from "../helpers/keyFormatters/players";
 import gameKeyFormatter from "../helpers/keyFormatters/games";
 import questionsKeyFormatter from "../helpers/keyFormatters/questions";
 import MQTTTopics from "../helpers/keyFormatters/mqtt";
+import { updateGameList } from "../helpers/mqtt/gamesList";
 
 export const sendGameState = async (gameId) => {
   const response = await redis.get(gameKeyFormatter(gameId));
@@ -56,6 +57,7 @@ mqtt.on(`message`, async (topic, message) => {
       );
     }
     sendGameState(gameId);
+    updateGameList();
   }
 });
 

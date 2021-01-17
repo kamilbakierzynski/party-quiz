@@ -13,7 +13,7 @@ router.post("/new-user", async (req, res) => {
   const response = await client.setex(
     newKey,
     KEY_EXPIRATION,
-    JSON.stringify(body)
+    JSON.stringify({...body, id})
   );
   return res.send({ response, key: id, username, avatarUrl });
 });

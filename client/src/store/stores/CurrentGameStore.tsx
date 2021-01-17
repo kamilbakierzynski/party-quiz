@@ -20,6 +20,7 @@ export interface CurrentGameStore {
   clearStore: Action<CurrentGameStore>;
   // HTPP Endpoints
   startGame: Thunk<CurrentGameStore, never, StoreModel>;
+  kickPlayer: Thunk<CurrentGameStore, User, StoreModel>;
   answerQuestion: Thunk<CurrentGameStore, { key: string }, StoreModel>;
   betOnAnswer: Thunk<
     CurrentGameStore,
@@ -98,6 +99,12 @@ const currentGame: CurrentGameStore = {
     const { game } = getState();
     if (game?.id) {
       serverAxios.post(`/current-game/${game.id}/start-game`);
+    }
+  }),
+  kickPlayer: thunk(async (actions, payload, { getState }) => {
+    const { game } = getState();
+    if (game?.id) {
+      serverAxios.post(`/current-game/${game.id}/kick-player`, payload);
     }
   }),
   answerQuestion: thunk(async (actions, payload, { getState }) => {

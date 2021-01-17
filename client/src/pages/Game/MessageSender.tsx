@@ -12,6 +12,7 @@ const MessageSender = () => {
   const [messageText, setMessageText] = useState("");
 
   const handleSendClick = () => {
+    if (!messageText) return;
     const message: Message = {
       sender: user!,
       text: messageText,

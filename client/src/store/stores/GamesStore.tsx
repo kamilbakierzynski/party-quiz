@@ -1,9 +1,10 @@
 import { Action, action, thunk, Thunk } from "easy-peasy";
 import { Moment } from "moment";
+import { StoreModel } from "store/Store";
 import { NumberLiteralType } from "typescript";
 import { serverAxios } from "../../config/serverAxios";
 import { User } from "./AuthStore";
-import { GameState } from "./CurrentGameStore";
+import { GameState, MQTTAction } from "./CurrentGameStore";
 import {
   GamesListResponse,
   JoinGameResponse,
@@ -11,6 +12,7 @@ import {
 } from "./ServerResponses";
 
 export interface GamesStore {
+  mqttReducer: Thunk<GamesStore, MQTTAction>;
   gamesArray: Array<Game>;
   overwriteGamesArray: Action<GamesStore, Array<Game>>;
   createGame: Thunk<GamesStore, CreateGame, never, never, Promise<string>>;
@@ -19,12 +21,19 @@ export interface GamesStore {
     GamesStore,
     JoinGame,
     never,
-    never,
+    StoreModel,
     Promise<{ status: boolean; id?: string }>
   >;
+  kickPlayer: Thunk<GamesStore, { gameId: string; user: User }>;
 }
 
 const games: GamesStore = {
+  mqttReducer: thunk((actions, payload, { getState }) => {
+    const { topic, message } = payload;
+    if (topic === "list") {
+      actions.overwriteGamesArray(JSON.parse(message.toString()));
+    }
+  }),
   gamesArray: [],
   overwriteGamesArray: action((state, payload) => {
     state.gamesArray = payload;
@@ -47,9 +56,10 @@ const games: GamesStore = {
       }
     });
   }),
-  joinGame: thunk(async (actions, payload) => {
+  joinGame: thunk(async (actions, payload, { getStoreState }) => {
+    const body = payload.body || getStoreState().auth.user;
     return serverAxios
-      .post<JoinGameResponse>("/games/join-game", payload.body, {
+      .post<JoinGameResponse>("/games/join-game", body, {
         params: payload.params,
       })
       .then(({ data }) => {
@@ -58,6 +68,12 @@ const games: GamesStore = {
         }
         return { status: false };
       });
+  }),
+  kickPlayer: thunk(async (actions, payload) => {
+    return await serverAxios.post(
+      `/games/${payload.gameId}/kick-player`,
+      payload.user
+    );
   }),
 };
 
@@ -86,7 +102,7 @@ export interface CreateGame {
 
 export interface JoinGame {
   params: { code?: string; id?: string };
-  body: User;
+  body?: User;
 }
 
 export default games;

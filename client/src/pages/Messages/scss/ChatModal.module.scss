@@ -1,0 +1,91 @@
+@mixin message {
+  max-width: 60%;
+  padding: 5px 15px;
+  border-radius: 20px;
+  align-items: center;
+  word-break: break-all;
+  text-align: justify;
+  transition: 0.3s;
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+@mixin wrapper {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-bottom: 10px;
+  &:last-of-type {
+    margin-bottom: 0px;
+  }
+
+  .time {
+    margin-top: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+    color: #aaaaaa;
+    text-overflow: ellipsis;
+    visibility: hidden;
+    font-size: 0.6em;
+    &:last-of-type {
+      visibility: visible;
+    }
+  }
+}
+
+.header_row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.content {
+  width: 100% !important;
+
+  .header_row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+
+    .header_buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+}
+
+.content_messages {
+  min-height: 50vh;
+}
+
+.wrapper {
+  .avatar {
+    padding-top: 3px;
+  }
+  &__sender {
+    @include wrapper;
+    flex-direction: row-reverse;
+
+    .avatar {
+      display: none;
+    }
+
+    .message {
+      @include message;
+      background-color: #0084ff;
+      color: white;
+    }
+  }
+  &__receiver {
+    @include wrapper;
+    flex-direction: row;
+    .message {
+      @include message;
+      background-color: #585858;
+      color: white;
+    }
+  }
+}

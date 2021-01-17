@@ -9,10 +9,6 @@ const PublicGamesList = () => {
 
   useEffect(() => {
     getGames();
-    const interval = setInterval(() => {
-      getGames();
-    }, 5000);
-    return () => clearInterval(interval);
     // eslint-disable-next-line
   }, []);
 

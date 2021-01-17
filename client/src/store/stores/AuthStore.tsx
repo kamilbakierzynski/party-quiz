@@ -1,6 +1,7 @@
 import { Action, action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import { serverAxios } from "../../config/serverAxios";
 import { RegisterUserResponse, VerifyUserResponse } from "./ServerResponses";
+import mqtt from "config/mqttClient";
 
 export interface AuthStore {
   user: User | undefined;
@@ -19,6 +20,8 @@ export interface AuthStore {
 const auth: AuthStore = {
   user: undefined,
   setUser: action((state, payload) => {
+    mqtt.subscribe(`messages/${payload?.id}/#`);
+    mqtt.subscribe(`invites/${payload?.id}`);
     state.user = payload;
   }),
   signedIn: computed((state) => state.user !== undefined),

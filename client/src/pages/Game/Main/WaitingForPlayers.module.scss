@@ -39,6 +39,12 @@
   margin-bottom: 10px;
   background-color: white;
   border: 1px solid #d1d8dd;
+  cursor: pointer;
+  transition: 0.3s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
 .avatar_wrapper {

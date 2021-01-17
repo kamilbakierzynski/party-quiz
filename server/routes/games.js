@@ -8,6 +8,7 @@ import nanoid from "../config/nanoidConfig";
 import Responses from "../helpers/responses/responses";
 import MQTTTopics from "../helpers/keyFormatters/mqtt";
 import { KEY_EXPIRATION } from "../config/gameConfig";
+import { updateGameList } from "../helpers/mqtt/gamesList";
 
 const router = express.Router({ mergeParams: true });
 
@@ -34,6 +35,8 @@ router.post("/new-game", async (req, res) => {
 
   mqttClient.subscribe(MQTTTopics.UserPresenceFormatter(id));
 
+  updateGameList();
+
   return res.send({ response, id: id });
 });
 
@@ -45,7 +48,7 @@ router.get("/list", async (req, res) => {
       joinedPlayers: await redis.lrange(
         playersKeyFormatter(getKeyFromRedisId(key)),
         0,
-        await redis.llen(playersKeyFormatter(getKeyFromRedisId(key)))
+        -1
       ),
       ...JSON.parse(await redis.get(key)),
     }))
@@ -67,16 +70,16 @@ router.get("/:idGame", async (req, res) => {
   const response = await redis.get(gameKeyFormatter(idGame));
   const format = {
     id: idGame,
+    ...JSON.parse(response),
     joinedPlayers: await redis.lrange(
       playersKeyFormatter(idGame),
       0,
-      await redis.llen(playersKeyFormatter(idGame))
+      -1
     ),
-    ...JSON.parse(response),
   };
   const mapPlayers = [format].map((game) => ({
     ...game,
-    joinedPlayers: game.joinedPlayers.map(JSON.parse),
+    joinedPlayers: game.joinedPlayers.map((player) => JSON.parse(player)),
   }));
   return res.send(mapPlayers);
 });
@@ -92,15 +95,42 @@ router.post("/join-game", async (req, res) => {
       }))
     );
     const game = games.find((game) => game.joinCode === code);
-    if (!game || game.started) {
+    if (!game) {
       return res.send({ response: Responses.FAIL });
+    }
+    if (game.started) {
+      const wasPlaying = !!game.state.scores.find((score) => score.user.id === body.id);
+      if (wasPlaying) {
+        await redis.lrem(
+          playersKeyFormatter(game.id),
+          0,
+          JSON.stringify(body)
+        );
+        const responsePush = await redis.rpush(
+          playersKeyFormatter(game.id),
+          JSON.stringify(body)
+        );
+        updateGameList();
+        return res.send({
+          response: responsePush !== undefined ? Responses.OK : Responses.FAIL,
+          id: game.id,
+        });
+      } else {
+        return res.send({ response: Responses.FAIL });
+      }
     }
     const currentPlayers = await redis.llen(playersKeyFormatter(game.id));
     if (currentPlayers < game.maxNumberOfPlayers && !game.started) {
+      await redis.lrem(
+        playersKeyFormatter(game.id),
+        0,
+        JSON.stringify(body)
+      );
       const responsePush = await redis.rpush(
         playersKeyFormatter(game.id),
         JSON.stringify(body)
       );
+      updateGameList();
       return res.send({
         response: responsePush !== undefined ? Responses.OK : Responses.FAIL,
         id: game.id,
@@ -113,10 +143,16 @@ router.post("/join-game", async (req, res) => {
     const gameString = await redis.get(gameKeyFormatter(id));
     const game = JSON.parse(gameString);
     if (currentPlayers < game.maxNumberOfPlayers && !game.started) {
+      await redis.lrem(
+        playersKeyFormatter(game.id),
+        0,
+        JSON.stringify(body)
+      );
       const responsePush = await redis.rpush(
         playersKeyFormatter(id),
         JSON.stringify(body)
       );
+      updateGameList();
       return res.send({
         response: responsePush !== undefined ? Responses.OK : Responses.FAIL,
         id: game.id,
@@ -127,7 +163,5 @@ router.post("/join-game", async (req, res) => {
   }
   return res.send({ response: Responses.FAIL });
 });
-
-
 
 export default router;

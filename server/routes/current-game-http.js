@@ -7,6 +7,7 @@ import playersKeyFormatter from "../helpers/keyFormatters/players";
 import gameKeyFormatter from "../helpers/keyFormatters/games";
 import questionsKeyFormatter from "../helpers/keyFormatters/questions";
 import { INITIAL_PLAYER_SCORE, KEY_EXPIRATION, SKIP_QUESTION_PENALTY } from "../config/gameConfig";
+import { updateGameList } from "../helpers/mqtt/gamesList";
 
 const router = express.Router({ mergeParams: true });
 
@@ -38,6 +39,20 @@ const saveChanges = async (idGame, game) => {
   return;
 };
 
+router.post("/:idGame/kick-player", async (req, res) => {
+  const idGame = req.params.idGame;
+  const player = req.body;
+  await client.lrem(
+    playersKeyFormatter(idGame),
+    0,
+    JSON.stringify(player)
+  );
+  const game = await readGame(idGame);
+  await saveChanges(idGame, game);
+  updateGameList();
+  return res.send({});
+});
+
 router.post("/:idGame/start-game", async (req, res) => {
   const { idGame } = req.params;
   const game = await readGame(idGame);
@@ -51,6 +66,7 @@ router.post("/:idGame/start-game", async (req, res) => {
   };
   const startedGame = { ...game, started: true, state: newGameState };
   await saveChanges(idGame, startedGame);
+  updateGameList();
   return res.send({});
 });
 
