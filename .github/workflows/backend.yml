@@ -35,3 +35,4 @@ jobs:
             git pull
             yarn
             forever restartall
+            docker start hivemq
